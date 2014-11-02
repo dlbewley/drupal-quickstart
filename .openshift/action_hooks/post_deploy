@@ -1,4 +1,39 @@
 #!/bin/bash
-# This is a simple post deploy hook executed after your application 
-# is deployed and started.  This script gets executed directly, so 
-# it could be python, php, ruby, etc.
+# This post deploy hook is executed after drupal is deployed and started.
+# This script gets executed directly, so it could be python, php, ruby, etc.
+
+#
+# Update existing modules
+#
+echo "drush update existing modules" >> ${OPENSHIFT_LOG_DIR}/drush.log
+drush -y pm-update >> ${OPENSHIFT_LOG_DIR}/drush.log
+
+#
+# Download modules
+#
+echo "drush module download" >> ${OPENSHIFT_LOG_DIR}/drush.log
+grep -v ^# ${OPENSHIFT_REPO_DIR}drush/download \
+  | while read module; do
+  echo "download $module" >> ${OPENSHIFT_LOG_DIR}/drush.log
+  drush pm-download "$module" --destination="${OPENSHIFT_DATA_DIR}downloads" --yes >> ${OPENSHIFT_LOG_DIR}/drush.log
+done
+
+#
+# Enable modules
+#
+echo "drush module enable" >> ${OPENSHIFT_LOG_DIR}/drush.log
+grep -v ^# ${OPENSHIFT_REPO_DIR}drush/enable \
+  | while read module; do
+  echo "enable $module" >> ${OPENSHIFT_LOG_DIR}/drush.log
+  drush pm-enable "$module" --yes >> ${OPENSHIFT_LOG_DIR}/drush.log
+done
+
+#
+# Disable modules
+#
+echo "drush module disable" >> ${OPENSHIFT_LOG_DIR}/drush.log
+grep -v ^# ${OPENSHIFT_REPO_DIR}drush/disable \
+  | while read module; do
+  echo "disable $module" >> ${OPENSHIFT_LOG_DIR}/drush.log
+  drush pm-disable "$module" --yes >> ${OPENSHIFT_LOG_DIR}/drush.log
+done

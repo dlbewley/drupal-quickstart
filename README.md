@@ -31,12 +31,13 @@ properly.  If you'd like to make the app scalable, you'll need to:
 3. Use a background task to copy file contents from gear to gear
 
 All of the scripts used to deploy and configure Drupal are located in
-the [build](.openshift/action_hooks/build) and [deploy](.openshift/action_hooks/deploy) hooks.
+the [build](.openshift/action_hooks/build), [deploy](.openshift/action_hooks/deploy),
+and [post_deploy](.openshift/action_hooks/post_deploy) hooks.
 
 Using Drush
 -----------
 
-The Drush management tool for Drupal is automatically installed
+The [Drush management tool](https://github.com/drush-ops/drush) for Drupal is automatically installed
 and you can simply use it while ssh'd into your gear.
 
     rhc ssh drupal
@@ -51,6 +52,11 @@ Drush has many helpful commands for managing your installation, such as:
     drush cc all		# Clear all cache
     drush core-cron     # Run cron
     drush updb			# Apply database updates
+
+Drush will be used to
+[download](drush/download), [enable](drush/enable), and [disable](drush/disable)
+modules automatically during execution of the
+[post_deploy](.openshift/action_hooks/post_deploy) action hook.
 
 
 Running on OpenShift
